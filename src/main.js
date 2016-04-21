@@ -8,18 +8,23 @@ new Vue({
     return {
       fb: new Firebase("https://flickering-fire-8061.firebaseio.com/"),
       techniques: [],
-      proposes: []
+      proposes: [],
+      tags: [],
+      tagsLoaded: false
     };
   },
   created() {
     const app = this;
     this.fb.child('techniques').on('value', function(data) {
-      app.techniques = data.val();
+      app.techniques = data.val() || [];
     });
     this.fb.child('proposes').on('value', function(data) {
-      app.proposes = data.val();
+      app.proposes = data.val() || [];
     });
-
+    this.fb.child('tags').on('value',function(data){
+      app.tags = data.val() || [];
+      app.tagsLoaded = true;
+    });
   },
   components: {
     'Techniques': Techniques,

@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <h1>{{ msg }}</h1>
-    <div  class='technique' data-id='{{key}}' v-for="(key,technique) in $root.techniques | filterBy filteringTag in 'tags' | limitBy 8">
+    <div  class='technique' data-id='{{key}}' v-for="(key,technique) in techniques | filterBy filteringTag in 'tags' | limitBy 8">
         <span class='name'>{{technique.name}}</span>
         <span class='description'>{{technique.description}}</span>
         <span class='author'>{{technique.author}}</span>
@@ -11,11 +11,14 @@
   </div>
   <select v-model="filteringTag">
     <option value="">--wybierz--</option>
-    <option v-for="tag in tags" :value="tag">
+    <option v-for="(k,tag) in tags" :value="k">
       {{tag}}
     </option>
   </select>
   {{l}}
+<pre>
+{{tags|json}}
+</pre>
 </template>
 
 <script>
@@ -29,13 +32,18 @@ export default {
   },
   computed : {
     tags()  {
-        return _.chain(this.$root.techniques)
-        .map((i) => {
-            return i.tags;
-        })
-        .reduce( (a,b) => {return a.concat(b);},[])
-        .uniq()
-        .value();
+        return this.$root.tags;
+    },
+    techniques(){
+      const root = this.$root;
+      return _(this.$root.techniques).map(tech => {
+        tech.tags = _(tech.tags).map( tag => {
+          if (root.tags.hasOwnProperty(tag)){
+          return root.tags[tag];
+        }
+        });
+        return tech;
+      });
     }
   },
   methods :{
